@@ -51,24 +51,47 @@ private val POWER_BUTTON_SIZE = 150.dp
 private val CONTENT_MAX_WIDTH = 380.dp
 
 /**
- * One precondition for syncing. The strings are resource ids so the list stays
- * declarative; hoist this into a ViewModel once the checks are real.
+ * One precondition for syncing.
+ *
+ * [onManage] is what the box does when tapped, in either direction: a met
+ * requirement stays tappable so it can be undone. A null [onManage] means the
+ * check is still scaffolding — the box renders but does not respond, rather
+ * than pretending to be a control that goes nowhere.
  */
 data class SyncRequirement(
     val labelRes: Int,
     val detailRes: Int,
-    val isMet: Boolean
+    val isMet: Boolean,
+    val onManage: (() -> Unit)? = null
 )
 
 /**
- * Placeholder requirement list. Every flag is false so the unmet state is what
- * shows by default — replace with state fed by the account layer, the battery
- * optimization check, and the SMS permission check.
+ * The live requirement list. Only the SMS check is real so far; the account and
+ * background rows are still fixed at unmet with no action attached.
  */
-private fun defaultRequirements(): List<SyncRequirement> = listOf(
-    SyncRequirement(R.string.requirement_account, R.string.requirement_account_detail, isMet = false),
-    SyncRequirement(R.string.requirement_background, R.string.requirement_background_detail, isMet = false),
-    SyncRequirement(R.string.requirement_sms, R.string.requirement_sms_detail, isMet = false)
+@Composable
+private fun rememberSyncRequirements(): List<SyncRequirement> {
+    val sms = rememberSmsPermissionState()
+    return listOf(
+        SyncRequirement(R.string.requirement_account, R.string.requirement_account_detail, isMet = false),
+        SyncRequirement(R.string.requirement_background, R.string.requirement_background_detail, isMet = false),
+        SyncRequirement(
+            labelRes = R.string.requirement_sms,
+            detailRes = R.string.requirement_sms_detail,
+            isMet = sms.isGranted,
+            onManage = sms.manage
+        )
+    )
+}
+
+/**
+ * Static stand-in for [rememberSyncRequirements] so previews render without
+ * touching the permission system, which has no Activity behind it in a preview.
+ */
+private fun previewRequirements(isMet: Boolean = false): List<SyncRequirement> = listOf(
+    SyncRequirement(R.string.requirement_account, R.string.requirement_account_detail, isMet),
+    SyncRequirement(R.string.requirement_background, R.string.requirement_background_detail, isMet),
+    SyncRequirement(R.string.requirement_sms, R.string.requirement_sms_detail, isMet, onManage = {})
 )
 
 /**
@@ -81,7 +104,7 @@ private fun defaultRequirements(): List<SyncRequirement> = listOf(
 fun LandingScreen(
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    requirements: List<SyncRequirement> = defaultRequirements(),
+    requirements: List<SyncRequirement> = rememberSyncRequirements(),
     isSyncing: Boolean = false,
     onPowerClick: () -> Unit = {}
 ) {
@@ -234,39 +257,59 @@ private fun PowerGlyph(tint: Color, modifier: Modifier = Modifier) {
     }
 }
 
-/** One checklist row: label, one line of why, and the state on the right. */
+/**
+ * One checklist row: label, one line of why, and the state on the right.
+ *
+ * A wired requirement is tappable whichever way it currently sits: unmet to go
+ * and satisfy it, met to go and undo it. Only an unwired one is inert, so the
+ * ripple always means something is about to happen.
+ */
 @Composable
 private fun RequirementBox(
     requirement: SyncRequirement,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceVariant
+    val onManage = requirement.onManage
+    val boxModifier = modifier.fillMaxWidth()
+    val shape = MaterialTheme.shapes.large
+    val color = MaterialTheme.colorScheme.surfaceVariant
+
+    // Two Surface overloads rather than a Modifier.clickable, so the ripple is
+    // clipped to the rounded shape instead of bleeding into its bounding box.
+    if (onManage != null) {
+        Surface(onClick = onManage, modifier = boxModifier, shape = shape, color = color) {
+            RequirementBoxContent(requirement)
+        }
+    } else {
+        Surface(modifier = boxModifier, shape = shape, color = color) {
+            RequirementBoxContent(requirement)
+        }
+    }
+}
+
+@Composable
+private fun RequirementBoxContent(requirement: SyncRequirement) {
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(requirement.labelRes),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = stringResource(requirement.detailRes),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            RequirementCheck(
-                isMet = requirement.isMet,
-                modifier = Modifier.padding(start = 12.dp)
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = stringResource(requirement.labelRes),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = stringResource(requirement.detailRes),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        RequirementCheck(
+            isMet = requirement.isMet,
+            modifier = Modifier.padding(start = 12.dp)
+        )
     }
 }
 
@@ -304,7 +347,10 @@ private fun RequirementCheck(isMet: Boolean, modifier: Modifier = Modifier) {
 @Composable
 private fun LandingScreenPreview() {
     OtpRelayTheme(dynamicColor = false) {
-        LandingScreen(onSettingsClick = {})
+        LandingScreen(
+            onSettingsClick = {},
+            requirements = previewRequirements(isMet = false)
+        )
     }
 }
 
@@ -314,7 +360,8 @@ private fun LandingScreenReadyPreview() {
     OtpRelayTheme(dynamicColor = false) {
         LandingScreen(
             onSettingsClick = {},
-            requirements = defaultRequirements().map { it.copy(isMet = true) }
+            requirements = previewRequirements(isMet = true),
+            isSyncing = true
         )
     }
 }

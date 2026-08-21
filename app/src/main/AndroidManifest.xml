@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--
+      The broadcast for an arriving message, which is how the relay sees a code.
+      READ_SMS is deliberately not declared: it only grants the existing inbox,
+      which the relay does not need. Note that this is a Play Console sensitive
+      permission and requires a declaration form before release.
+    -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
