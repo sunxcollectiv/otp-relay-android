@@ -35,9 +35,10 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun OtpRelayTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Material You wallpaper colors, available from Android 12. Turn this off if
-    // the app should always look the same on every device.
-    dynamicColor: Boolean = true,
+    // Material You wallpaper colors, available from Android 12. Off by default so
+    // the palette in Color.kt is what actually renders; the user can opt in from
+    // the settings screen, which is why this is a parameter and not a constant.
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
