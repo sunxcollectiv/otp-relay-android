@@ -7,4 +7,18 @@
     <string name="dynamic_color">Use wallpaper colors</string>
     <string name="dynamic_color_description">Match the app\'s palette to your wallpaper (Android 12+)</string>
     <string name="log_out">Log out</string>
+
+    <string name="start_syncing">Start syncing</string>
+    <string name="stop_syncing">Stop syncing</string>
+    <string name="requirements_heading">Before syncing can start</string>
+
+    <string name="requirement_account">Signed in to account</string>
+    <string name="requirement_account_detail">Relayed codes are delivered to your account\'s devices</string>
+    <string name="requirement_background">Background usage unrestricted</string>
+    <string name="requirement_background_detail">Battery setting set to Unrestricted so the relay is not stopped while idle</string>
+    <string name="requirement_sms">SMS access granted</string>
+    <string name="requirement_sms_detail">RECEIVE_SMS — needed to see incoming messages and pull the code out</string>
+
+    <string name="requirement_met">Done</string>
+    <string name="requirement_unmet">Not done yet</string>
 </resources>
