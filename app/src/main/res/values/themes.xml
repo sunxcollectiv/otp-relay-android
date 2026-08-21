@@ -1,0 +1,7 @@
+<resources>
+    <!--
+      Compose draws the entire UI, so the XML theme only needs to hand the window
+      over without an action bar. Colors live in ui/theme/Theme.kt.
+    -->
+    <style name="Theme.OTPRelay" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
