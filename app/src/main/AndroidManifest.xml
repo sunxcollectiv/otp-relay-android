@@ -11,6 +11,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!--
+      Lets the app show the one-tap "always run in background" dialog instead of
+      sending the user to hunt through the battery optimization list. A normal
+      permission, but Play restricts it to apps whose core function needs it.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
     <application
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"

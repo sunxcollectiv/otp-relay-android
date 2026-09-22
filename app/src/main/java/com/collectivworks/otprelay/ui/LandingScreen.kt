@@ -65,15 +65,13 @@ data class SyncRequirement(
     val onManage: (() -> Unit)? = null
 )
 
-/**
- * The live requirement list. The account and SMS checks are real; the
- * background row is still fixed at unmet with no action attached.
- */
+/** The live requirement list, each row backed by a real check. */
 @Composable
 private fun rememberSyncRequirements(
     isSignedIn: Boolean,
     onAccountClick: () -> Unit
 ): List<SyncRequirement> {
+    val battery = rememberBatteryOptimizationState()
     val sms = rememberSmsPermissionState()
     return listOf(
         SyncRequirement(
@@ -82,7 +80,12 @@ private fun rememberSyncRequirements(
             isMet = isSignedIn,
             onManage = onAccountClick
         ),
-        SyncRequirement(R.string.requirement_background, R.string.requirement_background_detail, isMet = false),
+        SyncRequirement(
+            labelRes = R.string.requirement_background,
+            detailRes = R.string.requirement_background_detail,
+            isMet = battery.isUnrestricted,
+            onManage = battery.manage
+        ),
         SyncRequirement(
             labelRes = R.string.requirement_sms,
             detailRes = R.string.requirement_sms_detail,
@@ -98,7 +101,7 @@ private fun rememberSyncRequirements(
  */
 private fun previewRequirements(isMet: Boolean = false): List<SyncRequirement> = listOf(
     SyncRequirement(R.string.requirement_account, R.string.requirement_account_detail, isMet, onManage = {}),
-    SyncRequirement(R.string.requirement_background, R.string.requirement_background_detail, isMet),
+    SyncRequirement(R.string.requirement_background, R.string.requirement_background_detail, isMet, onManage = {}),
     SyncRequirement(R.string.requirement_sms, R.string.requirement_sms_detail, isMet, onManage = {})
 )
 

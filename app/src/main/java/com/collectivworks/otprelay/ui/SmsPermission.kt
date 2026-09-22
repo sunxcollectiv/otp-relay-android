@@ -98,9 +98,9 @@ fun rememberSmsPermissionState(): SmsPermissionState {
                     // Taking a permission back is settings-only. `revokeSelfPermissionOnKill`
                     // exists from API 33, but it is both above this app's minSdk and fatal to
                     // the process — a checklist row is no place to kill the app from.
-                    isGranted -> context.openPermissionSettings()
+                    isGranted -> context.openAppInfoSettings()
                     dialogStillPossible -> launcher.launch(SMS_PERMISSION)
-                    else -> context.openPermissionSettings()
+                    else -> context.openAppInfoSettings()
                 }
             }
         )
@@ -111,8 +111,9 @@ private fun Context.hasSmsPermission(): Boolean =
     ContextCompat.checkSelfPermission(this, SMS_PERMISSION) == PackageManager.PERMISSION_GRANTED
 
 /**
- * Opens the App info page, which is as close to the SMS toggle as an ordinary
- * app can get: the user still has to tap through Permissions and then SMS.
+ * Opens the App info page. For the SMS grant this is as close to the toggle as
+ * an ordinary app can get: the user still has to tap through Permissions and
+ * then SMS. It is also where "App battery usage" lives on Android 12 and up.
  *
  * There is no supported deep link to the per-app permissions list. Both
  * `MANAGE_APP_PERMISSIONS` and `MANAGE_APP_PERMISSION` resolve to
@@ -123,7 +124,7 @@ private fun Context.hasSmsPermission(): Boolean =
  * The catch is for OEM skins that ship no handler for the App info screen at
  * all — rare, but an uncaught ActivityNotFoundException would crash the app.
  */
-private fun Context.openPermissionSettings() {
+internal fun Context.openAppInfoSettings() {
     val intent = Intent(
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
         Uri.fromParts("package", packageName, null)
