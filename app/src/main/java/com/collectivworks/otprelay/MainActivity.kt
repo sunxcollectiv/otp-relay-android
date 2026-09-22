@@ -29,7 +29,9 @@ class MainActivity : ComponentActivity() {
             OtpRelayTheme(dynamicColor = settings.dynamicColor) {
                 OtpRelayApp(
                     settings = settings,
-                    onDynamicColorChange = settingsViewModel::setDynamicColor
+                    onDynamicColorChange = settingsViewModel::setDynamicColor,
+                    onSignOut = settingsViewModel::signOut,
+                    onSendTestOtp = settingsViewModel::sendTestOtp
                 )
             }
         }

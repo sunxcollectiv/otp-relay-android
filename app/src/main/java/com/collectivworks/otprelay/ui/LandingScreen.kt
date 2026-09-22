@@ -66,14 +66,22 @@ data class SyncRequirement(
 )
 
 /**
- * The live requirement list. Only the SMS check is real so far; the account and
- * background rows are still fixed at unmet with no action attached.
+ * The live requirement list. The account and SMS checks are real; the
+ * background row is still fixed at unmet with no action attached.
  */
 @Composable
-private fun rememberSyncRequirements(): List<SyncRequirement> {
+private fun rememberSyncRequirements(
+    isSignedIn: Boolean,
+    onAccountClick: () -> Unit
+): List<SyncRequirement> {
     val sms = rememberSmsPermissionState()
     return listOf(
-        SyncRequirement(R.string.requirement_account, R.string.requirement_account_detail, isMet = false),
+        SyncRequirement(
+            labelRes = R.string.requirement_account,
+            detailRes = R.string.requirement_account_detail,
+            isMet = isSignedIn,
+            onManage = onAccountClick
+        ),
         SyncRequirement(R.string.requirement_background, R.string.requirement_background_detail, isMet = false),
         SyncRequirement(
             labelRes = R.string.requirement_sms,
@@ -89,7 +97,7 @@ private fun rememberSyncRequirements(): List<SyncRequirement> {
  * touching the permission system, which has no Activity behind it in a preview.
  */
 private fun previewRequirements(isMet: Boolean = false): List<SyncRequirement> = listOf(
-    SyncRequirement(R.string.requirement_account, R.string.requirement_account_detail, isMet),
+    SyncRequirement(R.string.requirement_account, R.string.requirement_account_detail, isMet, onManage = {}),
     SyncRequirement(R.string.requirement_background, R.string.requirement_background_detail, isMet),
     SyncRequirement(R.string.requirement_sms, R.string.requirement_sms_detail, isMet, onManage = {})
 )
@@ -104,7 +112,9 @@ private fun previewRequirements(isMet: Boolean = false): List<SyncRequirement> =
 fun LandingScreen(
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    requirements: List<SyncRequirement> = rememberSyncRequirements(),
+    isSignedIn: Boolean = false,
+    onAccountClick: () -> Unit = {},
+    requirements: List<SyncRequirement> = rememberSyncRequirements(isSignedIn, onAccountClick),
     isSyncing: Boolean = false,
     onPowerClick: () -> Unit = {}
 ) {
