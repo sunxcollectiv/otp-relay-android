@@ -54,7 +54,8 @@ class SmsRelayReceiver : BroadcastReceiver() {
             try {
                 for (otp in codes) {
                     try {
-                        auth.relayCode(otp.code, sender = otp.sender)
+                        val result = auth.relayCode(otp.code, sender = otp.sender)
+                        Log.i(TAG, "Relayed a code; reached ${result.delivered} client(s)")
                     } catch (e: RelayApiException) {
                         Log.w(TAG, "Relay failed: ${e.message}")
                     }

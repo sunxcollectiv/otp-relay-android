@@ -11,6 +11,7 @@ import com.collectivworks.otprelay.data.RelayApiException
 import com.collectivworks.otprelay.data.SettingsRepository
 import com.collectivworks.otprelay.data.authDataStore
 import com.collectivworks.otprelay.data.settingsDataStore
+import com.collectivworks.otprelay.relay.RelaySwitch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -51,7 +52,8 @@ data class SettingsUiState(
  */
 class SettingsViewModel(
     private val repository: SettingsRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val relaySwitch: RelaySwitch
 ) : ViewModel() {
 
     private val testOtp = MutableStateFlow<TestOtpStatus>(TestOtpStatus.Idle)
@@ -91,6 +93,9 @@ class SettingsViewModel(
     fun signOut() {
         // A result from the previous account would be misleading after sign-out.
         testOtp.value = TestOtpStatus.Idle
+        // With no publish token every relay would fail anyway; turning off also
+        // means signing into a different account never starts relaying unasked.
+        relaySwitch.setOn(false)
         viewModelScope.launch { authRepository.signOut() }
     }
 
@@ -100,7 +105,8 @@ class SettingsViewModel(
                 val application = this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]!!
                 SettingsViewModel(
                     SettingsRepository(application.settingsDataStore),
-                    AuthRepository(application.authDataStore)
+                    AuthRepository(application.authDataStore),
+                    RelaySwitch(application)
                 )
             }
         }

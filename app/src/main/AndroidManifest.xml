@@ -9,6 +9,13 @@
     -->
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
+    <!--
+      RECEIVE_SMS would otherwise imply telephony is required, hiding the app
+      from devices without it on Play. It installs fine there; the SMS
+      requirement row simply never gets anything to relay.
+    -->
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!--
@@ -39,6 +46,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          Starts disabled; the power button enables it through RelaySwitch, so an
+          app with the relay off is never woken for incoming texts. Exported so
+          the system can deliver to it, and guarded by BROADCAST_SMS so nothing
+          but the telephony stack can.
+        -->
+        <receiver
+            android:name=".relay.SmsRelayReceiver"
+            android:enabled="false"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

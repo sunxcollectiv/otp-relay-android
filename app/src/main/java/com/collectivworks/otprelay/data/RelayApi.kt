@@ -33,7 +33,10 @@ class RelayApiException(
  * `org.json` so the handful of calls here need no networking dependency.
  * Every call throws [RelayApiException] and nothing else on failure.
  */
-class RelayApi(private val baseUrl: String = RELAY_BASE_URL) {
+class RelayApi(
+    private val baseUrl: String = RELAY_BASE_URL,
+    private val timeoutMillis: Int = TIMEOUT_MILLIS
+) {
 
     /** What `POST /auth/login` returns: a bearer token for the management endpoints. */
     data class Session(val token: String, val expiresAt: String)
@@ -71,9 +74,14 @@ class RelayApi(private val baseUrl: String = RELAY_BASE_URL) {
      */
     data class OtpResult(val delivered: Int, val buffered: Boolean)
 
-    /** Relays [code] to the account's clients. Needs a publish device token, not a session token. */
-    suspend fun postOtp(publishToken: String, code: String): OtpResult {
+    /**
+     * Relays [code] to the account's clients. Needs a publish device token, not a
+     * session token. [sender] is shown alongside the code so the user can tell
+     * which service it is for.
+     */
+    suspend fun postOtp(publishToken: String, code: String, sender: String? = null): OtpResult {
         val body = JSONObject().put("code", code)
+        sender?.let { body.put("sender", it) }
         val json = request("POST", "/otp", body, bearer = publishToken).requireBody()
         return OtpResult(
             delivered = json.optInt("delivered"),
@@ -102,8 +110,8 @@ class RelayApi(private val baseUrl: String = RELAY_BASE_URL) {
         }
         try {
             connection.requestMethod = method
-            connection.connectTimeout = TIMEOUT_MILLIS
-            connection.readTimeout = TIMEOUT_MILLIS
+            connection.connectTimeout = timeoutMillis
+            connection.readTimeout = timeoutMillis
             connection.setRequestProperty("Accept", "application/json")
             bearer?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
 

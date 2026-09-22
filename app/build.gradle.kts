@@ -14,7 +14,12 @@ android {
     defaultConfig {
         applicationId = "com.collectivworks.otprelay"
         minSdk = 24
-        targetSdk = 37
+        // Held at 36 on purpose. Targeting 37 opts into Android 17's
+        // FILTER_GENERIC_OTP, which withholds the SMS_RECEIVED broadcast for any
+        // OTP-looking text for three hours, and that is the relay's whole job.
+        // Only apps with a CompanionDeviceManager association (or a few system
+        // roles) are exempt. Revisit before Play's target API deadline for 37.
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 

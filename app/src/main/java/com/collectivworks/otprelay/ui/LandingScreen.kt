@@ -196,8 +196,13 @@ private fun Wordmark(modifier: Modifier = Modifier) {
 }
 
 /**
- * The big circle. Disabled until every requirement is met, which is why the
- * colors key off [enabled] before [isOn].
+ * The big circle, in one of three states:
+ * - disabled (neutral grey): a requirement is unmet, so the tap does nothing;
+ * - off (pale primary): ready, not relaying;
+ * - on (solid primary): relaying incoming codes.
+ *
+ * The colors key off [enabled] before [isOn], so a relay left on reads as
+ * disabled while a requirement is unmet, which is also when it cannot work.
  */
 @Composable
 private fun PowerButton(
@@ -217,10 +222,14 @@ private fun PowerButton(
         else -> MaterialTheme.colorScheme.onPrimaryContainer
     }
 
+    val description = stringResource(if (isOn) R.string.stop_syncing else R.string.start_syncing)
+
     Surface(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.size(POWER_BUTTON_SIZE),
+        modifier = modifier
+            .size(POWER_BUTTON_SIZE)
+            .semantics { contentDescription = description },
         shape = CircleShape,
         color = container,
         contentColor = content
@@ -367,7 +376,19 @@ private fun LandingScreenPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Ready to sync")
+@Preview(showBackground = true, name = "Ready, relay off")
+@Composable
+private fun LandingScreenOffPreview() {
+    OtpRelayTheme(dynamicColor = false) {
+        LandingScreen(
+            onSettingsClick = {},
+            requirements = previewRequirements(isMet = true),
+            isSyncing = false
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Relaying")
 @Composable
 private fun LandingScreenReadyPreview() {
     OtpRelayTheme(dynamicColor = false) {

@@ -43,9 +43,9 @@ class AuthRepository(
      * Relays a code using whatever publish token is stored at the moment of the
      * call, so it always follows the current sign-in rather than a cached copy.
      */
-    suspend fun relayCode(code: String): RelayApi.OtpResult {
+    suspend fun relayCode(code: String, sender: String? = null): RelayApi.OtpResult {
         val token = publishToken.first() ?: throw RelayApiException("Not signed in", status = 401)
-        return api.postOtp(token, code)
+        return api.postOtp(token, code, sender)
     }
 
     /** Logs in, registers this phone as a publishing device, and stores both tokens. */

@@ -62,7 +62,10 @@ fun OtpRelayApp(
         }
     ) {
         composable(Routes.LANDING) {
+            val relay = rememberRelaySwitchState()
             LandingScreen(
+                isSyncing = relay.isOn,
+                onPowerClick = relay.toggle,
                 onSettingsClick = { navController.navigate(Routes.SETTINGS) },
                 isSignedIn = settings.account != null,
                 // Signed out, the row leads to sign-in. Signed in, it leads to
