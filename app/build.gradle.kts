@@ -5,6 +5,14 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+// Baked into BuildConfig so the settings screen can say which commit a build
+// came from: the version name alone does not change between dev builds. A
+// trailing "+" means the working tree had uncommitted changes.
+val gitCommit = providers.exec {
+    commandLine("git", "describe", "--always", "--dirty=+", "--abbrev=7")
+    isIgnoreExitValue = true
+}.standardOutput.asText.map { it.trim().ifEmpty { "unknown" } }
+
 android {
     namespace = "com.collectivworks.otprelay"
     compileSdk {
@@ -23,7 +31,13 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField("String", "GIT_COMMIT", "\"${gitCommit.get()}\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {

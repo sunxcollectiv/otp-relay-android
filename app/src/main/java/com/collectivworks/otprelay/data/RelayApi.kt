@@ -10,11 +10,13 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Where the relay server lives. `localhost` on a device or emulator is the
- * device itself, so during development forward the port with
- * `adb reverse tcp:4820 tcp:4820` to reach the server on the dev machine.
+ * Where the relay server lives. To point a debug build at a relay running on
+ * the dev machine instead, pass a `baseUrl` to [RelayApi]: `localhost` on a
+ * device or emulator is the device itself, so forward the port first with
+ * `adb reverse tcp:4820 tcp:4820`. Cleartext is permitted for loopback only --
+ * see `res/xml/network_security_config.xml`.
  */
-const val RELAY_BASE_URL = "http://localhost:4820"
+const val RELAY_BASE_URL = "https://api.otp-relay.app"
 
 private const val TIMEOUT_MILLIS = 10_000
 

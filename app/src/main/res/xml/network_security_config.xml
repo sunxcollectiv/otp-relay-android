@@ -2,8 +2,8 @@
 <!--
   Plain HTTP is blocked by default. It is allowed only for loopback addresses,
   for the development relay: `localhost` works through `adb reverse`, and
-  10.0.2.2 is the host machine as seen from the emulator. Everything else still
-  requires HTTPS. Remove these entries once the relay has a real HTTPS host.
+  10.0.2.2 is the host machine as seen from the emulator. Everything else,
+  including the real relay at api.otp-relay.app, still requires HTTPS.
 -->
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">

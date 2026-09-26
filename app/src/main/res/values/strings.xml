@@ -4,6 +4,9 @@
     <string name="back">Back</string>
     <string name="account_status">Account status</string>
     <string name="subscription_status">Subscription status</string>
+    <string name="version">Version</string>
+    <!-- version name, version code, git commit, install time -->
+    <string name="version_detail">%1$s (%2$d) · %3$s · installed %4$s</string>
     <string name="dynamic_color">Use wallpaper colors</string>
     <string name="dynamic_color_description">Match the app\'s palette to your wallpaper (Android 12+)</string>
     <string name="log_out">Log out</string>

@@ -1,6 +1,7 @@
 package com.collectivworks.otprelay.ui
 
 import android.os.Build
+import android.text.format.DateFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,11 +25,14 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.collectivworks.otprelay.BuildConfig
 import com.collectivworks.otprelay.R
 import com.collectivworks.otprelay.data.Account
 import com.collectivworks.otprelay.ui.theme.OtpRelayTheme
@@ -152,7 +156,39 @@ fun SettingsScreen(
                         .clickable(onClick = onLogoutClick)
                 )
             }
+
+            // Which build this is. The commit hash and install time are what tell
+            // two dev builds apart, since the version name rarely changes.
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.version)) },
+                supportingContent = {
+                    Text(
+                        stringResource(
+                            R.string.version_detail,
+                            BuildConfig.VERSION_NAME,
+                            BuildConfig.VERSION_CODE,
+                            BuildConfig.GIT_COMMIT,
+                            rememberInstallTime()
+                        )
+                    )
+                }
+            )
         }
+    }
+}
+
+/**
+ * When this APK was last installed. Falls back to "unknown" in
+ * previews, where there is no real package to look up.
+ */
+@Composable
+private fun rememberInstallTime(): String {
+    val context = LocalContext.current
+    return remember(context) {
+        runCatching {
+            val info = context.packageManager.getPackageInfo(context.packageName, 0)
+            DateFormat.format("yyyy-MM-dd HH:mm", info.lastUpdateTime).toString()
+        }.getOrDefault("unknown")
     }
 }
 
