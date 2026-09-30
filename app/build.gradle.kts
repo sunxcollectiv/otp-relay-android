@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     // Enables the Compose compiler. AGP 9 turns on the `compose` build feature
@@ -12,6 +14,25 @@ val gitCommit = providers.exec {
     commandLine("git", "describe", "--always", "--dirty=+", "--abbrev=7")
     isIgnoreExitValue = true
 }.standardOutput.asText.map { it.trim().ifEmpty { "unknown" } }
+
+// Release signing. Values come from local.properties (gitignored) on a dev
+// machine, or from environment variables on CI. Missing values leave the
+// release build type unsigned rather than failing, so `assembleDebug` and IDE
+// syncs keep working on a machine without the key.
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+fun signingValue(name: String): String? =
+    localProps.getProperty("release.$name")
+        ?: providers.environmentVariable("RELEASE_" + name.uppercase()).orNull
+val releaseStoreFile = signingValue("storeFile")
+val releaseStorePassword = signingValue("storePassword")
+val releaseKeyAlias = signingValue("keyAlias")
+val releaseKeyPassword = signingValue("keyPassword")
+val hasReleaseSigning = listOf(
+    releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword
+).all { !it.isNullOrBlank() }
 
 android {
     namespace = "com.collectivworks.otprelay"
@@ -29,7 +50,7 @@ android {
         // roles) are exempt. Revisit before Play's target API deadline for 37.
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.8"
 
         buildConfigField("String", "GIT_COMMIT", "\"${gitCommit.get()}\"")
 
@@ -40,8 +61,22 @@ android {
         buildConfig = true
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             optimization {
                 enable = false
             }
@@ -50,6 +85,20 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+
+// Name release APKs by version so downloads from the site are distinguishable
+// (otp-relay-0.8.apk rather than app-release.apk). Debug builds keep the
+// default name, which is what Android Studio and `adb install` scripts expect.
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        variant.outputs.forEach { output ->
+            output.outputFileName.set(
+                output.versionName.map { "otp-relay-$it.apk" }
+            )
+        }
     }
 }
 
