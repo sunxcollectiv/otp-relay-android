@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +37,12 @@ import com.collectivworks.otprelay.BuildConfig
 import com.collectivworks.otprelay.R
 import com.collectivworks.otprelay.data.Account
 import com.collectivworks.otprelay.ui.theme.OtpRelayTheme
+
+/**
+ * Where the privacy policy is published. Play requires it to be reachable from
+ * inside the app as well as from the store listing, and the two must agree.
+ */
+const val PRIVACY_POLICY_URL = "https://otp-relay.app/privacy"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -133,6 +140,19 @@ fun SettingsScreen(
                 )
                 HorizontalDivider()
             }
+
+            // Opens in the browser rather than a WebView so the page can change
+            // without an app release. openUri throws when nothing on the device
+            // handles https, which is rare enough to just swallow.
+            val uriHandler = LocalUriHandler.current
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.privacy_policy)) },
+                supportingContent = { Text(stringResource(R.string.privacy_policy_description)) },
+                modifier = Modifier.clickable {
+                    runCatching { uriHandler.openUri(PRIVACY_POLICY_URL) }
+                }
+            )
+            HorizontalDivider()
 
             // Nothing to log out of while signed out.
             if (account != null) {

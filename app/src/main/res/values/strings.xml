@@ -9,6 +9,8 @@
     <string name="version_detail">%1$s (%2$d) · %3$s · installed %4$s</string>
     <string name="dynamic_color">Use wallpaper colors</string>
     <string name="dynamic_color_description">Match the app\'s palette to your wallpaper (Android 12+)</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="privacy_policy_description">What the app sends to the relay server and how it is handled</string>
     <string name="log_out">Log out</string>
     <string name="account_signed_in_as">Signed in · %1$s</string>
     <string name="account_signed_out">Not signed in</string>
