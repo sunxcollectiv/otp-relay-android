@@ -8,6 +8,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColors = lightColorScheme(
@@ -64,3 +65,29 @@ fun OtpRelayTheme(
         content = content
     )
 }
+
+/** Container and content colors for the power button's on and off states. */
+class RelayColors(
+    val activeContainer: Color,
+    val activeContent: Color,
+    val inactiveContainer: Color,
+    val inactiveContent: Color
+)
+
+@Composable
+fun relayColors(darkTheme: Boolean = isSystemInDarkTheme()): RelayColors =
+    if (darkTheme) {
+        RelayColors(
+            activeContainer = RelayActiveContainerDark,
+            activeContent = RelayActiveContentDark,
+            inactiveContainer = RelayInactiveContainerDark,
+            inactiveContent = RelayInactiveContentDark
+        )
+    } else {
+        RelayColors(
+            activeContainer = RelayActiveContainer,
+            activeContent = RelayActiveContent,
+            inactiveContainer = RelayInactiveContainer,
+            inactiveContent = RelayInactiveContent
+        )
+    }

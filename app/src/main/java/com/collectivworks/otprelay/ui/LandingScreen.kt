@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.collectivworks.otprelay.R
 import com.collectivworks.otprelay.ui.theme.OtpRelayTheme
+import com.collectivworks.otprelay.ui.theme.relayColors
 
 /** Diameter of the power button. */
 private val POWER_BUTTON_SIZE = 150.dp
@@ -162,8 +163,16 @@ fun LandingScreen(
 
             Spacer(Modifier.height(40.dp))
 
+            // What the button will do next. While a requirement is unmet the tap
+            // does nothing, so the heading points at the checklist instead.
             Text(
-                text = stringResource(R.string.requirements_heading),
+                text = stringResource(
+                    when {
+                        !canSync -> R.string.requirements_heading
+                        isSyncing -> R.string.syncing_on_heading
+                        else -> R.string.syncing_off_heading
+                    }
+                ),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -198,8 +207,8 @@ private fun Wordmark(modifier: Modifier = Modifier) {
 /**
  * The big circle, in one of three states:
  * - disabled (neutral grey): a requirement is unmet, so the tap does nothing;
- * - off (pale primary): ready, not relaying;
- * - on (solid primary): relaying incoming codes.
+ * - off (desaturated green): ready, not relaying;
+ * - on (solid green): relaying incoming codes.
  *
  * The colors key off [enabled] before [isOn], so a relay left on reads as
  * disabled while a requirement is unmet, which is also when it cannot work.
@@ -211,15 +220,16 @@ private fun PowerButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val relay = relayColors()
     val container = when {
         !enabled -> MaterialTheme.colorScheme.surfaceVariant
-        isOn -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.primaryContainer
+        isOn -> relay.activeContainer
+        else -> relay.inactiveContainer
     }
     val content = when {
         !enabled -> MaterialTheme.colorScheme.onSurfaceVariant
-        isOn -> MaterialTheme.colorScheme.onPrimary
-        else -> MaterialTheme.colorScheme.onPrimaryContainer
+        isOn -> relay.activeContent
+        else -> relay.inactiveContent
     }
 
     val description = stringResource(if (isOn) R.string.stop_syncing else R.string.start_syncing)

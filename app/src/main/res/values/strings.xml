@@ -31,6 +31,8 @@
     <string name="start_syncing">Start syncing</string>
     <string name="stop_syncing">Stop syncing</string>
     <string name="requirements_heading">Before syncing can start</string>
+    <string name="syncing_off_heading">Tap the power button to enable</string>
+    <string name="syncing_on_heading">Actively syncing OTP messages</string>
 
     <string name="requirement_account">Signed in to account</string>
     <string name="requirement_account_detail">Relayed codes are delivered to your account\'s devices</string>
