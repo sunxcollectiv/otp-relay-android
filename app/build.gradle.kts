@@ -57,6 +57,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Name the App Bundle by version (otp-relay-1.0.0-release.aab) so uploads
+    // to Play are distinguishable in a downloads folder. Bundle outputs cannot
+    // be renamed per-output the way APKs are below, so this goes through the
+    // archive base name instead; the APK block overrides it for APKs anyway.
+    base.archivesName.set("otp-relay-${defaultConfig.versionName}")
+
     buildFeatures {
         buildConfig = true
     }
