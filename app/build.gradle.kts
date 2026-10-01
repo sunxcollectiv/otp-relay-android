@@ -50,7 +50,7 @@ android {
         // roles) are exempt. Revisit before Play's target API deadline for 37.
         targetSdk = 36
         versionCode = 1
-        versionName = "0.8"
+        versionName = "1.0.0"
 
         buildConfigField("String", "GIT_COMMIT", "\"${gitCommit.get()}\"")
 
@@ -90,7 +90,7 @@ android {
 
 
 // Name release APKs by version so downloads from the site are distinguishable
-// (otp-relay-0.8.apk rather than app-release.apk). Debug builds keep the
+// (otp-relay-1.0.0.apk rather than app-release.apk). Debug builds keep the
 // default name, which is what Android Studio and `adb install` scripts expect.
 androidComponents {
     onVariants(selector().withBuildType("release")) { variant ->
