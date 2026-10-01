@@ -35,13 +35,13 @@ val hasReleaseSigning = listOf(
 ).all { !it.isNullOrBlank() }
 
 android {
-    namespace = "com.collectivworks.otprelay"
+    namespace = "app.otprelay"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.collectivworks.otprelay"
+        applicationId = "app.otprelay"
         minSdk = 24
         // Held at 36 on purpose. Targeting 37 opts into Android 17's
         // FILTER_GENERIC_OTP, which withholds the SMS_RECEIVED broadcast for any
