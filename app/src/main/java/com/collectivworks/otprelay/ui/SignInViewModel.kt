@@ -72,7 +72,7 @@ private fun RelayApiException.toSignInError(): SignInError = when (status) {
 }
 
 /** What the device shows up as in the account's device list. The API caps names at 64. */
-private fun deviceName(): String {
+internal fun deviceName(): String {
     val model = if (Build.MODEL.startsWith(Build.MANUFACTURER, ignoreCase = true)) {
         Build.MODEL
     } else {

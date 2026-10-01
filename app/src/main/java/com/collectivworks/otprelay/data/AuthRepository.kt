@@ -48,6 +48,17 @@ class AuthRepository(
         return api.postOtp(token, code, sender)
     }
 
+    /**
+     * Creates the account, then signs in with the same credentials so the user
+     * lands signed in rather than back at the sign-in form. If the sign-in half
+     * fails the account still exists, so the caller should offer sign-in rather
+     * than another registration attempt.
+     */
+    suspend fun register(email: String, password: String, deviceName: String) {
+        api.register(email, password)
+        signIn(email, password, deviceName)
+    }
+
     /** Logs in, registers this phone as a publishing device, and stores both tokens. */
     suspend fun signIn(email: String, password: String, deviceName: String) {
         val session = api.login(email, password)

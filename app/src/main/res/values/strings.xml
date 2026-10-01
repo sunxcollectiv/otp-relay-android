@@ -29,6 +29,22 @@
     <string name="sign_in_error_credentials">Incorrect email or password</string>
     <string name="sign_in_error_unreachable">Could not reach the relay server. Check your connection and try again.</string>
     <string name="sign_in_error_server">Sign-in failed: %1$s</string>
+    <string name="no_account_create_one">Don\'t have an account? Create one</string>
+
+    <string name="create_account">Create account</string>
+    <string name="create_account_description">Create an OTP Relay account. You\'ll be signed in and this phone added to your devices so it can relay codes.</string>
+    <string name="confirm_password">Confirm password</string>
+    <plurals name="password_min_length">
+        <item quantity="one">At least %1$d character</item>
+        <item quantity="other">At least %1$d characters</item>
+    </plurals>
+    <plurals name="register_error_password_short">
+        <item quantity="one">Password must be at least %1$d character</item>
+        <item quantity="other">Password must be at least %1$d characters</item>
+    </plurals>
+    <string name="register_error_password_mismatch">Passwords don\'t match</string>
+    <string name="register_error_cannot_create">Could not create an account with that email. If it\'s already registered, sign in instead.</string>
+    <string name="register_error_server">Could not create account: %1$s</string>
 
     <string name="start_syncing">Start syncing</string>
     <string name="stop_syncing">Stop syncing</string>

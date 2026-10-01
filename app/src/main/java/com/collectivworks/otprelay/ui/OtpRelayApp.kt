@@ -22,6 +22,7 @@ private object Routes {
     const val LANDING = "landing"
     const val SETTINGS = "settings"
     const val SIGN_IN = "sign_in"
+    const val REGISTER = "register"
 }
 
 private const val NAV_ANIM_MILLIS = 300
@@ -85,6 +86,20 @@ fun OtpRelayApp(
                 onSubmit = viewModel::signIn,
                 onInputChange = viewModel::clearError,
                 onSignedIn = { navController.popBackStack() },
+                onCreateAccountClick = { navController.navigate(Routes.REGISTER) },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.REGISTER) {
+            val viewModel: RegisterViewModel = viewModel(factory = RegisterViewModel.Factory)
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+            RegisterScreen(
+                state = state,
+                onSubmit = viewModel::register,
+                onInputChange = viewModel::clearError,
+                // Registration signs in too, so drop the sign-in screen beneath
+                // this one and return to wherever the user started from.
+                onRegistered = { navController.popBackStack(Routes.SIGN_IN, inclusive = true) },
                 onBack = { navController.popBackStack() }
             )
         }

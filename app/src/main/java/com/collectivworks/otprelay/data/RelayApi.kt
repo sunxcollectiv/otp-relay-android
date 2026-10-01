@@ -20,6 +20,9 @@ const val RELAY_BASE_URL = "https://api.otp-relay.app"
 
 private const val TIMEOUT_MILLIS = 10_000
 
+/** Mirrors the server's `SignupIn` schema, so the form can reject short passwords before a round trip. */
+const val MIN_PASSWORD_LENGTH = 12
+
 /**
  * A failed call to the relay. [status] is the HTTP status when the server
  * answered, or null when it could not be reached at all.
@@ -45,6 +48,18 @@ class RelayApi(
 
     /** What `POST /devices` returns. The server shows [token] exactly once. */
     data class Device(val id: String, val token: String)
+
+    /**
+     * `POST /auth/register`. Creates the account on the free plan; it does not
+     * sign in, so follow with [login]. The server requires at least
+     * [MIN_PASSWORD_LENGTH] characters and answers 409 when the email is taken.
+     */
+    suspend fun register(email: String, password: String) {
+        val body = JSONObject()
+            .put("email", email)
+            .put("password", password)
+        request("POST", "/auth/register", body)
+    }
 
     suspend fun login(email: String, password: String): Session {
         val body = JSONObject()
